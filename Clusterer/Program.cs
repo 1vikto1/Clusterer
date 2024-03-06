@@ -1,58 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
-// Класс представляет точку с координатами X и Y
-public class Point
+// Структура для представления точки на плоскости
+struct Point
 {
-    public double X { get; set; } // Координата X
-    public double Y { get; set; } // Координата Y
+    public double x;
+    public double y;
 
-    // Конструктор класса Point, инициализирует точку с заданными координатами
-    public Point(double x, double y)
+    
+
+    // Метод для вычисления расстояния между текущей точкой и заданной startPoint
+    public double DistanceTo(Point startPoint)
     {
-        X = x;
-        Y = y;
+        return Math.Sqrt(Math.Pow(x - startPoint.x, 2) + Math.Pow(y - startPoint.y, 2));
+    }
+
+    // Метод для вычисления угла между текущей точкой и заданной startPoint в градусах
+    public double AngleTo(Point startPoint)
+    {
+        return Math.Atan2(y - startPoint.y, x - startPoint.x) * (180 / Math.PI);
     }
 }
 
-public class Program
+class Program
 {
-    // Функция для вычисления расстояния между двумя точками
-    public static double Distance(Point point1, Point point2)
+    static void Main(string[] args)
     {
-        return Math.Sqrt(Math.Pow(point1.X - point2.X, 2) + Math.Pow(point1.Y - point2.Y, 2));
-    }
+        Point[] pointsArray = { /* массив точек */ };
 
-    public static void Main()
-    {
-        // Фиксированная стартовая точка
-        Point startPoint = new Point(53.361231, 83.765688);
+        Point startPoint = new Point { x = /* координата x начальной точки */, y =  /* координата y начальной точки */ };
 
-        Console.WriteLine("Введите координаты других точек:");
+        List<Point> farthestPoints = new List<Point>();
+        double maxDistance = 0;
 
-        // Создание списка для хранения других точек
-        List<Point> points = new List<Point>();
-        points.Add(CreatePoint());
-        points.Add(CreatePoint());
+        // Проход по всем точкам из массива точек
+        foreach (var point in pointsArray)
+        {
+            double distance = point.DistanceTo(startPoint); // Расстояние от текущей точки до начальной точки
+            double angle = Math.Abs(point.AngleTo(startPoint)); // Угол между текущей точкой и начальной точкой
 
-        // Нахождение самой удаленной точки от стартовой точки
-        Point farthestPoint = points.OrderByDescending(p => Distance(startPoint, p)).First();
+            // Проверка условий на наибольшее расстояние и разницу направления более 20 градусов
+            if (distance > maxDistance && angle > 20)
+            {
+                maxDistance = distance;
+                farthestPoints.Clear();
+                farthestPoints.Add(point);
+            }
+            else if (distance == maxDistance && angle > 20)
+            {
+                farthestPoints.Add(point);
+            }
+        }
 
-        // Вывод результатов
-        Console.WriteLine($"Самая удаленная точка от стартовой с координатами ({startPoint.X}, {startPoint.Y}) имеет координаты ({farthestPoint.X}, {farthestPoint.Y})");
-    }
-
-    // Функция для создания точки с введенными пользователем координатами
-    public static Point CreatePoint()
-    {
-        Console.Write("X: ");
-        double x = Convert.ToDouble(Console.ReadLine());
-
-        Console.Write("Y: ");
-        double y = Convert.ToDouble(Console.ReadLine());
-
-        return new Point(x, y);
+        // Вывод найденных точек с самым большим расстоянием и разницей направления более 20 градусов
+        Console.WriteLine($"Самые отдаленные точки от начальной точки с разницей направления более 20 градусов ({farthestPoints.Count} точек):");
+        foreach (var point in farthestPoints)
+        {
+            Console.WriteLine($"Точка: x = {point.x}, y = {point.y}");
+        }
     }
 }
-
